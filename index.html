@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>منصة هاكثون ابتكر للتعليم | Ibtikr Education Hackathon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/[email protected]/dist/sheetjs.full.min.js"></script>
+<style>
+  :root{
+    --navy-deep:#1A1B4B;
+    --navy:#222558;
+    --navy-light:#2D3070;
+    --teal:#3FBFA9;
+    --teal-bright:#4ED4BC;
+    --cyan:#5BC8E8;
+    --mint:#A8E6CF;
+    --gold:#E8C547;
+    --white:#FFFFFF;
+    --off-white:#F5F6FA;
+    --gray-light:#E8EAF2;
+    --gray:#9FA3B8;
+    --text-dark:#1A1B4B;
+    --shadow-sm:0 2px 8px rgba(26,27,75,0.08);
+    --shadow-md:0 8px 24px rgba(26,27,75,0.12);
+    --shadow-lg:0 16px 48px rgba(26,27,75,0.18);
+    --radius-sm:8px;
+    --radius-md:12px;
+    --radius-lg:18px;
+    --radius-xl:24px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{font-family:'Tajawal',sans-serif;background:var(--off-white);color:var(--text-dark);min-height:100vh}
+  button{font-family:inherit;cursor:pointer;border:none;background:none}
+  input,select,textarea{font-family:inherit}
+
+  /* ========= LAYOUT ========= */
+  .app{display:flex;min-height:100vh}
+  .sidebar{
+    width:280px;background:var(--navy-deep);color:var(--white);
+    padding:24px 0;position:fixed;height:100vh;overflow-y:auto;
+    display:flex;flex-direction:column;
+    background-image:
+      radial-gradient(circle at 80% 10%, rgba(63,191,169,0.15) 0%, transparent 35%),
+      radial-gradient(circle at 20% 90%, rgba(91,200,232,0.1) 0%, transparent 30%);
+  }
+  .main{flex:1;margin-right:280px;padding:0;min-height:100vh;background:var(--off-white)}
+
+  /* sidebar branding */
+  .brand{padding:0 24px 24px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:18px}
+  .brand-logo{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .brand-mark{
+    width:46px;height:46px;border-radius:12px;
+    background:linear-gradient(135deg,var(--teal) 0%,var(--cyan) 100%);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Cairo',sans-serif;font-weight:900;font-size:20px;color:var(--navy-deep);
+    box-shadow:0 4px 14px rgba(63,191,169,0.4);
+  }
+  .brand-text h1{font-family:'Cairo',sans-serif;font-size:16px;font-weight:800;line-height:1.2}
+  .brand-text p{font-size:11px;color:var(--mint);opacity:0.8;margin-top:2px}
+  .brand-tag{font-size:11px;color:var(--gray);line-height:1.6}
+  .brand-tag span{color:var(--teal-bright);font-weight:500}
+
+  .nav{flex:1;padding:0 14px}
+  .nav-section{margin-bottom:8px}
+  .nav-label{font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1.2px;padding:0 12px 8px;font-weight:700}
+  .nav-item{
+    display:flex;align-items:center;gap:12px;padding:11px 14px;
+    border-radius:10px;color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;
+    transition:all 0.2s;margin-bottom:3px;cursor:pointer;width:100%;text-align:right;
+  }
+  .nav-item:hover{background:rgba(255,255,255,0.06);color:var(--white)}
+  .nav-item.active{
+    background:linear-gradient(135deg,rgba(63,191,169,0.2) 0%,rgba(91,200,232,0.1) 100%);
+    color:var(--teal-bright);
+    border-right:3px solid var(--teal);
+  }
+  .nav-item svg{width:18px;height:18px;flex-shrink:0}
+  .nav-badge{margin-right:auto;background:var(--teal);color:var(--navy-deep);
+    font-size:10px;padding:2px 7px;border-radius:8px;font-weight:700}
+
+  .sidebar-footer{padding:14px 24px;border-top:1px solid rgba(255,255,255,0.08);font-size:11px;color:var(--gray);line-height:1.7}
+  .sidebar-footer strong{color:var(--mint);font-weight:600}
+
+  /* ========= TOP BAR ========= */
+  .topbar{
+    background:var(--white);padding:18px 32px;border-bottom:1px solid var(--gray-light);
+    display:flex;align-items:center;justify-content:space-between;
+    position:sticky;top:0;z-index:50;
+  }
+  .topbar h2{font-family:'Cairo',sans-serif;font-size:22px;font-weight:800;color:var(--navy-deep)}
+  .topbar-sub{font-size:13px;color:var(--gray);margin-top:2px}
+  .topbar-actions{display:flex;align-items:center;gap:10px}
+  .day-pills{display:flex;gap:6px;background:var(--gray-light);padding:4px;border-radius:12px}
+  .day-pill{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;color:var(--gray);transition:all 0.2s}
+  .day-pill.active{background:var(--white);color:var(--navy-deep);box-shadow:var(--shadow-sm)}
+  .day-pill.active.is-today{background:var(--teal);color:var(--white)}
+
+  /* ========= CONTENT ========= */
+  .content{padding:28px 32px;max-width:1400px}
+  .page{display:none}
+  .page.active{display:block;animation:fadeIn 0.4s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* ========= HERO/BANNER ========= */
+  .hero-banner{
+    background:linear-gradient(135deg,var(--navy-deep) 0%,var(--navy-light) 100%);
+    border-radius:var(--radius-lg);padding:32px 36px;color:var(--white);
+    position:relative;overflow:hidden;margin-bottom:24px;
+  }
+  .hero-banner::before{
+    content:"";position:absolute;top:-40px;right:-40px;width:200px;height:200px;
+    background:linear-gradient(135deg,var(--teal) 0%,transparent 70%);
+    border-radius:30px;transform:rotate(20deg);opacity:0.4;
+  }
+  .hero-banner::after{
+    content:"";position:absolute;bottom:-50px;left:30%;width:160px;height:160px;
+    border:2px solid rgba(91,200,232,0.3);border-radius:50%;
+  }
+  .hero-banner .deco-square{
+    position:absolute;width:80px;height:80px;border:2px solid rgba(63,191,169,0.4);
+    border-radius:14px;top:30%;left:20%;transform:rotate(15deg);
+  }
+  .hero-content{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap}
+  .hero-text h1{font-family:'Cairo',sans-serif;font-size:32px;font-weight:900;line-height:1.2;margin-bottom:6px}
+  .hero-text h1 .green{color:var(--teal-bright)}
+  .hero-text h1 .blue{color:var(--cyan)}
+  .hero-text p{color:var(--mint);font-size:15px;font-weight:300;max-width:500px;line-height:1.7}
+  .hero-stats{display:flex;gap:14px;flex-wrap:wrap}
+  .hero-stat{
+    background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.15);border-radius:14px;
+    padding:14px 20px;min-width:120px;
+  }
+  .hero-stat .num{font-family:'Cairo',sans-serif;font-size:28px;font-weight:900;color:var(--teal-bright);line-height:1}
+  .hero-stat .lbl{font-size:11px;color:rgba(255,255,255,0.7);margin-top:4px;font-weight:500}
+
+  /* ========= STAT CARDS ========= */
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+  .stat-card{
+    background:var(--white);border-radius:var(--radius-md);padding:20px;
+    border:1px solid var(--gray-light);position:relative;overflow:hidden;
+    transition:all 0.3s;
+  }
+  .stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:transparent}
+  .stat-card .stat-icon{
+    width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;
+  }
+  .stat-card.c-teal .stat-icon{background:rgba(63,191,169,0.12);color:var(--teal)}
+  .stat-card.c-blue .stat-icon{background:rgba(91,200,232,0.12);color:var(--cyan)}
+  .stat-card.c-gold .stat-icon{background:rgba(232,197,71,0.15);color:#D4A82E}
+  .stat-card.c-navy .stat-icon{background:rgba(26,27,75,0.08);color:var(--navy-deep)}
+  .stat-card svg{width:22px;height:22px}
+  .stat-card .stat-num{font-family:'Cairo',sans-serif;font-size:30px;font-weight:900;color:var(--navy-deep);line-height:1}
+  .stat-card .stat-lbl{font-size:13px;color:var(--gray);font-weight:500;margin-top:6px}
+  .stat-card .stat-trend{position:absolute;top:18px;left:18px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px}
+  .trend-up{background:rgba(63,191,169,0.12);color:var(--teal)}
+  .trend-neutral{background:rgba(159,163,184,0.12);color:var(--gray)}
+
+  /* ========= CARD GENERIC ========= */
+  .card{background:var(--white);border-radius:var(--radius-lg);padding:24px;border:1px solid var(--gray-light);margin-bottom:20px}
+  .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px}
+  .card-title{font-family:'Cairo',sans-serif;font-size:18px;font-weight:800;color:var(--navy-deep)}
+  .card-sub{font-size:13px;color:var(--gray);margin-top:2px}
+
+  /* ========= BUTTONS ========= */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 22px;border-radius:10px;font-size:14px;font-weight:600;
+    transition:all 0.2s;cursor:pointer;border:1px solid transparent;
+  }
+  .btn-primary{background:var(--teal);color:var(--white)}
+  .btn-primary:hover{background:#2EA994;transform:translateY(-1px);box-shadow:0 6px 18px rgba(63,191,169,0.35)}
+  .btn-navy{background:var(--navy-deep);color:var(--white)}
+  .btn-navy:hover{background:var(--navy)}
+  .btn-outline{background:transparent;color:var(--navy-deep);border-color:var(--gray-light)}
+  .btn-outline:hover{background:var(--off-white);border-color:var(--gray)}
+  .btn-ghost{background:transparent;color:var(--gray)}
+  .btn-ghost:hover{background:var(--gray-light);color:var(--navy-deep)}
+  .btn-sm{padding:7px 14px;font-size:12px}
+  .btn-icon{width:36px;height:36px;padding:0;border-radius:10px}
+  .btn svg{width:16px;height:16px}
+
+  /* ========= FORMS ========= */
+  .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .form-grid.cols-3{grid-template-columns:repeat(3,1fr)}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field label{font-size:13px;font-weight:600;color:var(--navy-deep)}
+  .field label .req{color:#E04444;margin-right:2px}
+  .field input,.field select,.field textarea{
+    padding:11px 14px;border:1.5px solid var(--gray-light);border-radius:10px;
+    font-size:14px;color:var(--navy-deep);background:var(--white);
+    transition:all 0.2s;
+  }
+  .field input:focus,.field select:focus,.field textarea:focus{
+    outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(63,191,169,0.12);
+  }
+  .field-help{font-size:11px;color:var(--gray);margin-top:2px}
+
+  /* ========= SEARCH ========= */
+  .search-bar{
+    display:flex;align-items:center;gap:10px;background:var(--white);
+    padding:10px 16px;border-radius:12px;border:1px solid var(--gray-light);flex:1;max-width:380px;
+  }
+  .search-bar:focus-within{border-color:var(--teal);box-shadow:0 0 0 3px rgba(63,191,169,0.1)}
+  .search-bar input{flex:1;border:none;outline:none;font-size:14px;background:transparent}
+  .search-bar svg{width:18px;height:18px;color:var(--gray)}
+
+  /* ========= TABLE ========= */
+  .table-wrap{overflow-x:auto;border-radius:var(--radius-md);border:1px solid var(--gray-light)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  thead{background:var(--off-white)}
+  th{
+    padding:14px 16px;text-align:right;font-size:12px;font-weight:700;
+    color:var(--gray);text-transform:uppercase;letter-spacing:0.5px;
+    border-bottom:1px solid var(--gray-light);
+  }
+  td{padding:14px 16px;border-bottom:1px solid var(--gray-light);color:var(--navy-deep);vertical-align:middle}
+  tbody tr{transition:background 0.15s}
+  tbody tr:hover{background:var(--off-white)}
+  tbody tr:last-child td{border-bottom:none}
+  .avatar{
+    width:36px;height:36px;border-radius:50%;
+    background:linear-gradient(135deg,var(--teal),var(--cyan));
+    display:inline-flex;align-items:center;justify-content:center;
+    color:var(--white);font-weight:700;font-size:13px;font-family:'Cairo',sans-serif;
+  }
+  .avatar.c2{background:linear-gradient(135deg,#A66CFF,#5BC8E8)}
+  .avatar.c3{background:linear-gradient(135deg,var(--gold),#FF9F45)}
+  .avatar.c4{background:linear-gradient(135deg,#FF6B9D,#A66CFF)}
+  .name-cell{display:flex;align-items:center;gap:10px}
+  .name-cell .info .nm{font-weight:600;color:var(--navy-deep);font-size:14px}
+  .name-cell .info .em{font-size:12px;color:var(--gray)}
+
+  /* ========= BADGES ========= */
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+  .badge-success{background:rgba(63,191,169,0.12);color:var(--teal)}
+  .badge-warning{background:rgba(232,197,71,0.18);color:#A88521}
+  .badge-info{background:rgba(91,200,232,0.15);color:#2191B6}
+  .badge-danger{background:rgba(224,68,68,0.12);color:#C73838}
+  .badge-neutral{background:var(--gray-light);color:var(--gray)}
+  .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+  /* ========= ATTENDANCE GRID ========= */
+  .attend-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+  .attend-cell{
+    padding:6px;text-align:center;border-radius:8px;font-size:11px;font-weight:700;
+    cursor:pointer;transition:all 0.2s;border:1px solid transparent;
+  }
+  .attend-cell.present{background:rgba(63,191,169,0.15);color:var(--teal);border-color:rgba(63,191,169,0.3)}
+  .attend-cell.absent{background:rgba(224,68,68,0.08);color:#C73838;border-color:rgba(224,68,68,0.2)}
+  .attend-cell.pending{background:var(--gray-light);color:var(--gray)}
+  .attend-cell:hover{transform:scale(1.05)}
+
+  /* ========= ROW ACTIONS ========= */
+  .row-actions{display:flex;gap:6px;justify-content:flex-end}
+  .icon-btn{
+    width:32px;height:32px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;
+    background:var(--off-white);color:var(--gray);transition:all 0.2s;cursor:pointer;
+  }
+  .icon-btn:hover{background:var(--teal);color:var(--white)}
+  .icon-btn.danger:hover{background:#E04444}
+  .icon-btn svg{width:14px;height:14px}
+
+  /* ========= MODAL ========= */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(26,27,75,0.55);backdrop-filter:blur(4px);
+    display:none;align-items:center;justify-content:center;z-index:200;padding:20px;
+  }
+  .modal-backdrop.show{display:flex;animation:fadeIn 0.2s}
+  .modal{
+    background:var(--white);border-radius:var(--radius-xl);max-width:560px;width:100%;
+    max-height:90vh;overflow-y:auto;animation:slideUp 0.3s;
+  }
+  @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+  .modal-head{padding:24px 28px;border-bottom:1px solid var(--gray-light);display:flex;justify-content:space-between;align-items:center}
+  .modal-head h3{font-family:'Cairo',sans-serif;font-size:20px;font-weight:800;color:var(--navy-deep)}
+  .modal-body{padding:24px 28px}
+  .modal-foot{padding:16px 28px;border-top:1px solid var(--gray-light);display:flex;gap:10px;justify-content:flex-start}
+
+  /* ========= CHECK-IN ========= */
+  .checkin-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:24px}
+  .quick-checkin{
+    background:linear-gradient(135deg,var(--navy-deep) 0%,var(--navy-light) 100%);
+    border-radius:var(--radius-lg);padding:32px;color:var(--white);
+    position:relative;overflow:hidden;
+  }
+  .quick-checkin::before{
+    content:"";position:absolute;top:-30px;left:-30px;width:160px;height:160px;
+    background:radial-gradient(circle,rgba(63,191,169,0.25),transparent 70%);border-radius:50%;
+  }
+  .quick-checkin h3{font-family:'Cairo',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px;position:relative}
+  .quick-checkin > p{color:var(--mint);font-size:13px;margin-bottom:22px;position:relative}
+  .checkin-input-wrap{position:relative;z-index:2;margin-bottom:20px}
+  .checkin-input-wrap input{
+    width:100%;padding:18px 22px;border-radius:14px;border:2px solid rgba(255,255,255,0.15);
+    background:rgba(255,255,255,0.1);color:var(--white);font-size:18px;font-weight:600;
+    backdrop-filter:blur(10px);transition:all 0.2s;text-align:center;letter-spacing:1px;
+  }
+  .checkin-input-wrap input::placeholder{color:rgba(255,255,255,0.4);font-weight:400}
+  .checkin-input-wrap input:focus{outline:none;border-color:var(--teal);background:rgba(255,255,255,0.15)}
+  .checkin-actions{display:flex;gap:10px;position:relative;z-index:2}
+  .checkin-actions .btn{flex:1}
+  .recent-checkins{position:relative;z-index:2;margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.1)}
+  .recent-checkins h4{font-size:11px;font-weight:700;color:var(--mint);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+  .recent-item{
+    display:flex;align-items:center;gap:12px;padding:10px 12px;
+    background:rgba(255,255,255,0.05);border-radius:10px;margin-bottom:6px;
+  }
+  .recent-item .nm{font-weight:600;font-size:13px}
+  .recent-item .tm{margin-right:auto;font-size:11px;color:var(--mint);font-family:monospace}
+  .recent-item .badge-success{background:rgba(63,191,169,0.25);color:var(--teal-bright)}
+
+  /* ========= QR ========= */
+  .qr-card{background:var(--white);border-radius:var(--radius-lg);padding:24px;border:1px solid var(--gray-light);text-align:center}
+  .qr-display{
+    background:var(--off-white);border-radius:var(--radius-md);padding:24px;
+    display:flex;align-items:center;justify-content:center;margin-bottom:16px;min-height:240px;
+  }
+  .qr-display canvas,.qr-display img{max-width:200px;height:auto}
+  .qr-card h4{font-family:'Cairo',sans-serif;font-size:16px;font-weight:800;color:var(--navy-deep);margin-bottom:6px}
+  .qr-card p{font-size:12px;color:var(--gray);line-height:1.6;margin-bottom:14px}
+
+  /* ========= CERTIFICATE ========= */
+  .cert-preview{
+    width:100%;aspect-ratio:1.414/1;background:var(--white);
+    border:1px solid var(--gray-light);border-radius:var(--radius-md);
+    position:relative;overflow:hidden;
+  }
+  .cert-canvas{
+    width:100%;height:100%;background:var(--white);position:relative;overflow:hidden;
+    font-family:'Tajawal',sans-serif;
+  }
+  .cert-bg{
+    position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 90% 10%, rgba(63,191,169,0.08) 0%, transparent 35%),
+      radial-gradient(circle at 10% 90%, rgba(91,200,232,0.06) 0%, transparent 30%),
+      var(--white);
+  }
+  .cert-deco-tl{position:absolute;top:0;right:0;width:240px;height:240px;background:linear-gradient(135deg,var(--navy-deep) 0%,var(--navy-light) 100%);clip-path:polygon(0 0,100% 0,100% 70%,30% 100%,0 80%);opacity:0.95}
+  .cert-deco-br{position:absolute;bottom:0;left:0;width:200px;height:200px;background:linear-gradient(135deg,var(--teal) 0%,var(--cyan) 100%);clip-path:polygon(0 30%,70% 0,100% 30%,100% 100%,0 100%);opacity:0.9}
+  .cert-deco-square1{position:absolute;top:60px;left:80px;width:50px;height:50px;border:2px solid var(--teal);transform:rotate(20deg);opacity:0.5}
+  .cert-deco-square2{position:absolute;bottom:140px;right:120px;width:35px;height:35px;background:var(--cyan);opacity:0.3;transform:rotate(15deg)}
+  .cert-deco-circle1{position:absolute;top:40%;right:8%;width:60px;height:60px;border:2px solid var(--cyan);border-radius:50%;opacity:0.3}
+  .cert-deco-lines{position:absolute;top:40px;right:40px;width:140px;height:140px;background:repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(255,255,255,0.15) 8px,rgba(255,255,255,0.15) 9px);clip-path:polygon(0 0,100% 0,100% 70%,30% 100%,0 80%)}
+
+  .cert-content{position:relative;z-index:2;padding:48px 60px;height:100%;display:flex;flex-direction:column}
+  .cert-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+  .cert-logos{display:flex;gap:16px;align-items:center}
+  .cert-logo-box{
+    background:rgba(255,255,255,0.95);padding:8px 14px;border-radius:8px;
+    font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;color:var(--navy-deep);
+    display:flex;align-items:center;gap:8px;border:1px solid var(--gray-light);
+  }
+  .cert-logo-mini{width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,var(--teal),var(--cyan));display:inline-block}
+  .cert-event-tag{
+    background:linear-gradient(135deg,var(--teal),var(--cyan));
+    color:var(--white);padding:6px 14px;border-radius:20px;font-weight:700;font-size:12px;
+  }
+  .cert-title-block{text-align:center;margin-top:auto;margin-bottom:auto}
+  .cert-eyebrow{font-size:14px;color:var(--gray);font-weight:500;letter-spacing:2px;margin-bottom:12px;text-transform:uppercase}
+  .cert-main-title{font-family:'Cairo',sans-serif;font-size:46px;font-weight:900;color:var(--navy-deep);line-height:1.1;margin-bottom:8px}
+  .cert-main-title .accent1{color:var(--teal)}
+  .cert-main-title .accent2{color:var(--cyan)}
+  .cert-divider{width:80px;height:3px;background:var(--teal);margin:18px auto;border-radius:2px}
+  .cert-recipient-label{font-size:13px;color:var(--gray);margin-bottom:8px}
+  .cert-recipient{font-family:'Cairo',sans-serif;font-size:38px;font-weight:800;color:var(--navy-deep);margin-bottom:14px}
+  .cert-description{font-size:14px;color:var(--text-dark);line-height:1.9;max-width:560px;margin:0 auto}
+  .cert-description strong{color:var(--teal);font-weight:700}
+  .cert-footer{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px;padding-top:20px;border-top:1px dashed var(--gray-light)}
+  .cert-sig{text-align:center}
+  .cert-sig-line{width:140px;border-top:1.5px solid var(--navy-deep);margin-bottom:6px}
+  .cert-sig-name{font-family:'Cairo',sans-serif;font-weight:700;font-size:13px;color:var(--navy-deep)}
+  .cert-sig-title{font-size:10px;color:var(--gray);margin-top:2px}
+  .cert-meta{text-align:center}
+  .cert-meta .id{font-family:monospace;font-size:11px;color:var(--gray);background:var(--off-white);padding:4px 10px;border-radius:6px;margin-bottom:6px;display:inline-block}
+  .cert-meta .dt{font-size:11px;color:var(--gray)}
+  .cert-qr-mini{width:60px;height:60px;background:var(--off-white);border-radius:8px;padding:4px;display:flex;align-items:center;justify-content:center}
+
+  /* ========= CERT GRID ========= */
+  .cert-list-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .cert-row{
+    display:flex;align-items:center;gap:14px;padding:14px;
+    background:var(--white);border:1px solid var(--gray-light);border-radius:var(--radius-md);
+    transition:all 0.2s;
+  }
+  .cert-row:hover{border-color:var(--teal);box-shadow:var(--shadow-sm)}
+  .cert-row .info{flex:1;min-width:0}
+  .cert-row .nm{font-weight:700;color:var(--navy-deep);font-size:14px;font-family:'Cairo',sans-serif}
+  .cert-row .meta{font-size:11px;color:var(--gray);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap}
+
+  /* ========= EMPTY STATES ========= */
+  .empty{text-align:center;padding:60px 24px;color:var(--gray)}
+  .empty-icon{
+    width:64px;height:64px;border-radius:18px;background:var(--gray-light);
+    display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;
+  }
+  .empty-icon svg{width:28px;height:28px;color:var(--gray)}
+  .empty h3{font-family:'Cairo',sans-serif;font-size:16px;color:var(--navy-deep);margin-bottom:6px}
+  .empty p{font-size:13px;line-height:1.7}
+
+  /* ========= TOAST ========= */
+  .toast-container{position:fixed;bottom:24px;left:24px;z-index:300;display:flex;flex-direction:column;gap:8px}
+  .toast{
+    background:var(--white);border-radius:var(--radius-md);padding:14px 18px;
+    box-shadow:var(--shadow-lg);min-width:280px;max-width:380px;
+    display:flex;align-items:center;gap:12px;animation:slideUp 0.3s;
+    border-right:4px solid var(--teal);
+  }
+  .toast.error{border-color:#E04444}
+  .toast.warning{border-color:var(--gold)}
+  .toast .icon{width:32px;height:32px;border-radius:8px;background:rgba(63,191,169,0.15);color:var(--teal);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .toast.error .icon{background:rgba(224,68,68,0.12);color:#E04444}
+  .toast.warning .icon{background:rgba(232,197,71,0.18);color:#A88521}
+  .toast svg{width:18px;height:18px}
+  .toast .msg{font-size:13px;color:var(--navy-deep);font-weight:500;line-height:1.4}
+
+  /* ========= FILTERS ========= */
+  .filter-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+
+  /* ========= UTILS ========= */
+  .flex{display:flex}.flex-1{flex:1}.gap-1{gap:6px}.gap-2{gap:12px}.gap-3{gap:18px}
+  .text-gray{color:var(--gray)}.text-teal{color:var(--teal)}
+  .mt-2{margin-top:12px}.mb-2{margin-bottom:12px}
+  .hide{display:none}
+
+  @media (max-width:1024px){
+    .stats-grid{grid-template-columns:repeat(2,1fr)}
+    .checkin-grid{grid-template-columns:1fr}
+    .form-grid,.form-grid.cols-3{grid-template-columns:1fr}
+    .cert-list-grid{grid-template-columns:1fr}
+  }
+  @media (max-width:768px){
+    .sidebar{transform:translateX(100%);transition:transform 0.3s;z-index:100}
+    .sidebar.open{transform:none}
+    .main{margin-right:0}
+    .content{padding:18px}
+    .topbar{padding:14px 18px}
+  }
+
+  /* === SCROLLBAR === */
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--gray-light);border-radius:4px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--gray)}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ========== SIDEBAR ========== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">
+        <div class="brand-mark">ا</div>
+        <div class="brand-text">
+          <h1>ابتكر للتعليم</h1>
+          <p>Ibtikr Education Hackathon</p>
+        </div>
+      </div>
+      <div class="brand-tag">منصة إدارة الحضور وإصدار الشهادات<br><span>معًا نبتكر الحل .. لنتعلم بذكاء</span></div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-section">
+        <div class="nav-label">القائمة الرئيسية</div>
+        <button class="nav-item active" data-page="dashboard">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span>لوحة التحكم</span>
+        </button>
+        <button class="nav-item" data-page="participants">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          <span>المشاركون</span>
+          <span class="nav-badge" id="navParticipants">0</span>
+        </button>
+        <button class="nav-item" data-page="register">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+          <span>تسجيل جديد</span>
+        </button>
+        <button class="nav-item" data-page="checkin">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          <span>تسجيل الحضور</span>
+        </button>
+        <button class="nav-item" data-page="certificates">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+          <span>الشهادات</span>
+        </button>
+      </div>
+
+      <div class="nav-section" style="margin-top:18px">
+        <div class="nav-label">الأدوات</div>
+        <button class="nav-item" data-page="qr">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+          <span>رمز QR للحضور</span>
+        </button>
+        <button class="nav-item" data-page="settings">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <span>الإعدادات</span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <strong>جامعة القصيم</strong> &middot; مركز الابتكار<br>
+      المركز الوطني للتعليم الإلكتروني<br>
+      AWS &middot; 2026
+    </div>
+  </aside>
+
+  <!-- ========== MAIN ========== -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h2 id="pageTitle">لوحة التحكم</h2>
+        <div class="topbar-sub" id="pageSub">نظرة شاملة على هاكثون ابتكر للتعليم</div>
+      </div>
+      <div class="topbar-actions">
+        <div class="day-pills" id="dayPills">
+          <button class="day-pill active" data-day="0">الأيام كلها</button>
+          <button class="day-pill" data-day="1">اليوم 1</button>
+          <button class="day-pill" data-day="2">اليوم 2</button>
+          <button class="day-pill" data-day="3">اليوم 3</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- ============ DASHBOARD ============ -->
+      <div class="page active" id="page-dashboard">
+        <div class="hero-banner">
+          <div class="deco-square"></div>
+          <div class="hero-content">
+            <div class="hero-text">
+              <h1>هاكثون <span class="green">ابتكر</span> <span class="blue">للتعليم</span></h1>
+              <p>منصة شاملة لإدارة المشاركين وتسجيل الحضور وإصدار الشهادات على مدى ثلاثة أيام من الإبداع والابتكار في مجال التعليم.</p>
+            </div>
+            <div class="hero-stats">
+              <div class="hero-stat"><div class="num" id="heroParticipants">0</div><div class="lbl">مشارك مسجل</div></div>
+              <div class="hero-stat"><div class="num" id="heroAttendance">0%</div><div class="lbl">نسبة الحضور</div></div>
+              <div class="hero-stat"><div class="num" id="heroCerts">0</div><div class="lbl">شهادة جاهزة</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card c-teal">
+            <div class="stat-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <div class="stat-num" id="dashTotal">0</div>
+            <div class="stat-lbl">إجمالي المشاركين</div>
+          </div>
+          <div class="stat-card c-blue">
+            <div class="stat-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            </div>
+            <div class="stat-num" id="dashPresent">0</div>
+            <div class="stat-lbl">حضور اليوم الحالي</div>
+          </div>
+          <div class="stat-card c-gold">
+            <div class="stat-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z"/></svg>
+            </div>
+            <div class="stat-num" id="dashEligible">0</div>
+            <div class="stat-lbl">مؤهل للشهادة</div>
+          </div>
+          <div class="stat-card c-navy">
+            <div class="stat-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17v-2a4 4 0 014-4h4m0 0l-3-3m3 3l-3 3M5 7h4a4 4 0 014 4v6"/></svg>
+            </div>
+            <div class="stat-num" id="dashRate">0%</div>
+            <div class="stat-lbl">نسبة الحضور الكلية</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">حضور المشاركين عبر الأيام</div>
+                <div class="card-sub">توزيع الحضور لكل يوم من أيام الهاكثون</div>
+              </div>
+            </div>
+            <div id="attendanceChart" style="height:240px;position:relative">
+              <svg viewBox="0 0 600 240" style="width:100%;height:100%">
+                <defs>
+                  <linearGradient id="barGrad1" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#3FBFA9"/><stop offset="100%" stop-color="#5BC8E8"/>
+                  </linearGradient>
+                  <linearGradient id="barGrad2" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#5BC8E8"/><stop offset="100%" stop-color="#A66CFF"/>
+                  </linearGradient>
+                </defs>
+                <line x1="60" y1="40" x2="60" y2="200" stroke="#E8EAF2" stroke-width="1"/>
+                <line x1="60" y1="200" x2="560" y2="200" stroke="#E8EAF2" stroke-width="1"/>
+                <text x="50" y="50" text-anchor="end" font-size="10" fill="#9FA3B8">100%</text>
+                <text x="50" y="125" text-anchor="end" font-size="10" fill="#9FA3B8">50%</text>
+                <text x="50" y="200" text-anchor="end" font-size="10" fill="#9FA3B8">0%</text>
+                <g id="chartBars"></g>
+              </svg>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">آخر التسجيلات</div>
+            </div>
+            <div id="recentList" style="display:flex;flex-direction:column;gap:8px;max-height:280px;overflow-y:auto"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ PARTICIPANTS ============ -->
+      <div class="page" id="page-participants">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">قائمة المشاركين</div>
+              <div class="card-sub">إدارة جميع المشاركين المسجلين في الهاكثون</div>
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-outline btn-sm" onclick="exportToExcel()">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                تصدير Excel
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="showPage('register')">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                إضافة مشارك
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-row">
+            <div class="search-bar">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              <input type="text" id="searchInput" placeholder="البحث بالاسم، البريد، أو الهاتف..." oninput="renderParticipants()">
+            </div>
+            <select id="filterCategory" onchange="renderParticipants()" style="padding:10px 14px;border:1px solid var(--gray-light);border-radius:10px;font-size:14px;background:var(--white)">
+              <option value="">كل الفئات</option>
+              <option value="طالب">طالب</option>
+              <option value="معلم">معلم</option>
+              <option value="باحث">باحث</option>
+              <option value="رائد أعمال">رائد أعمال</option>
+              <option value="مطور">مطور</option>
+            </select>
+          </div>
+
+          <div class="table-wrap">
+            <table id="participantsTable">
+              <thead>
+                <tr>
+                  <th>المشارك</th>
+                  <th>الفئة</th>
+                  <th>الجهة</th>
+                  <th>الفريق</th>
+                  <th>الحضور (3 أيام)</th>
+                  <th>الحالة</th>
+                  <th style="text-align:left">إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="participantsBody"></tbody>
+            </table>
+          </div>
+          <div id="emptyParticipants" class="empty hide">
+            <div class="empty-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857"/></svg>
+            </div>
+            <h3>لا يوجد مشاركون بعد</h3>
+            <p>ابدأ بإضافة المشاركين من خلال نموذج التسجيل.</p>
+            <button class="btn btn-primary" style="margin-top:14px" onclick="showPage('register')">إضافة أول مشارك</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ REGISTER ============ -->
+      <div class="page" id="page-register">
+        <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:20px">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">تسجيل مشارك جديد</div>
+                <div class="card-sub">أدخل بيانات المشارك لإضافته إلى الهاكثون</div>
+              </div>
+            </div>
+            <form id="registerForm" onsubmit="handleRegister(event)">
+              <div class="form-grid">
+                <div class="field">
+                  <label>الاسم الكامل <span class="req">*</span></label>
+                  <input type="text" name="name" required placeholder="مثال: عبدالله بن محمد">
+                </div>
+                <div class="field">
+                  <label>البريد الإلكتروني <span class="req">*</span></label>
+                  <input type="email" name="email" required placeholder="example@qu.edu.sa">
+                </div>
+                <div class="field">
+                  <label>رقم الجوال <span class="req">*</span></label>
+                  <input type="tel" name="phone" required placeholder="05xxxxxxxx">
+                </div>
+                <div class="field">
+                  <label>رقم الهوية / السجل</label>
+                  <input type="text" name="idNumber" placeholder="رقم الهوية أو السجل المدني">
+                </div>
+                <div class="field">
+                  <label>الفئة <span class="req">*</span></label>
+                  <select name="category" required>
+                    <option value="">اختر الفئة</option>
+                    <option value="طالب">طالب</option>
+                    <option value="معلم">معلم</option>
+                    <option value="باحث">باحث</option>
+                    <option value="رائد أعمال">رائد أعمال</option>
+                    <option value="مطور">مطور</option>
+                    <option value="مصمم">مصمم</option>
+                    <option value="أخرى">أخرى</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>الجهة / الجامعة</label>
+                  <input type="text" name="organization" placeholder="جامعة القصيم، شركة، إلخ">
+                </div>
+                <div class="field">
+                  <label>اسم الفريق</label>
+                  <input type="text" name="team" placeholder="اختياري - اسم الفريق إن وجد">
+                </div>
+                <div class="field">
+                  <label>المدينة</label>
+                  <input type="text" name="city" placeholder="بريدة، الرياض، إلخ">
+                </div>
+              </div>
+              <div class="field" style="margin-top:14px">
+                <label>ملاحظات إضافية</label>
+                <textarea name="notes" rows="2" placeholder="معلومات إضافية، احتياجات خاصة، إلخ" style="resize:vertical"></textarea>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:20px">
+                <button type="submit" class="btn btn-primary">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                  تسجيل المشارك
+                </button>
+                <button type="reset" class="btn btn-outline">إعادة تعيين</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card" style="background:linear-gradient(135deg,#F0FBF8 0%,#F5F8FF 100%);border-color:rgba(63,191,169,0.2)">
+            <div class="card-title" style="display:flex;align-items:center;gap:8px">
+              <svg width="22" height="22" fill="none" stroke="var(--teal)" stroke-width="2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              نصائح التسجيل
+            </div>
+            <ul style="list-style:none;padding:0;margin-top:16px">
+              <li style="padding:10px 0;border-bottom:1px dashed var(--gray-light);font-size:13px;color:var(--text-dark);line-height:1.7">
+                <strong style="color:var(--teal)">✓</strong> يمكنك إضافة المشاركين في أي وقت قبل أو أثناء الهاكثون
+              </li>
+              <li style="padding:10px 0;border-bottom:1px dashed var(--gray-light);font-size:13px;color:var(--text-dark);line-height:1.7">
+                <strong style="color:var(--teal)">✓</strong> سيحصل كل مشارك على رمز QR فريد للحضور السريع
+              </li>
+              <li style="padding:10px 0;border-bottom:1px dashed var(--gray-light);font-size:13px;color:var(--text-dark);line-height:1.7">
+                <strong style="color:var(--teal)">✓</strong> الشهادة تصدر تلقائيًا عند حضور يومين على الأقل
+              </li>
+              <li style="padding:10px 0;font-size:13px;color:var(--text-dark);line-height:1.7">
+                <strong style="color:var(--teal)">✓</strong> يمكن تعديل أو حذف بيانات المشارك في أي وقت
+              </li>
+            </ul>
+            <div style="margin-top:18px;padding:14px;background:var(--white);border-radius:10px;border:1px solid var(--gray-light)">
+              <div style="font-size:12px;color:var(--gray);margin-bottom:6px">آخر مشارك مسجل</div>
+              <div id="lastRegistered" style="font-weight:700;color:var(--navy-deep);font-family:'Cairo',sans-serif">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ CHECKIN ============ -->
+      <div class="page" id="page-checkin">
+        <div class="checkin-grid">
+          <div class="quick-checkin">
+            <h3>تسجيل الحضور السريع</h3>
+            <p>أدخل اسم المشارك أو بريده الإلكتروني أو رقمه لتسجيل الحضور</p>
+            <div class="checkin-input-wrap">
+              <input type="text" id="checkinInput" placeholder="ابحث بالاسم أو البريد أو الجوال..." autocomplete="off">
+            </div>
+            <div class="checkin-actions">
+              <button class="btn btn-primary" onclick="performCheckin()">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+                تسجيل الحضور
+              </button>
+              <button class="btn btn-outline" style="background:rgba(255,255,255,0.1);color:var(--white);border-color:rgba(255,255,255,0.2)" onclick="showPage('qr')">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4"/></svg>
+                مسح QR
+              </button>
+            </div>
+            <div class="recent-checkins">
+              <h4>آخر التسجيلات</h4>
+              <div id="recentCheckins"></div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:0">
+            <div class="card-header">
+              <div>
+                <div class="card-title">إحصائيات اليوم</div>
+                <div class="card-sub" id="todayDate"></div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
+              <div style="background:rgba(63,191,169,0.08);border-radius:12px;padding:16px;text-align:center">
+                <div style="font-family:'Cairo',sans-serif;font-size:32px;font-weight:900;color:var(--teal)" id="checkinPresent">0</div>
+                <div style="font-size:12px;color:var(--text-dark);font-weight:600;margin-top:4px">حاضر اليوم</div>
+              </div>
+              <div style="background:rgba(232,197,71,0.12);border-radius:12px;padding:16px;text-align:center">
+                <div style="font-family:'Cairo',sans-serif;font-size:32px;font-weight:900;color:#A88521" id="checkinRemaining">0</div>
+                <div style="font-size:12px;color:var(--text-dark);font-weight:600;margin-top:4px">في الانتظار</div>
+              </div>
+            </div>
+            <div style="background:var(--off-white);border-radius:10px;padding:14px;font-size:12px;line-height:1.7;color:var(--text-dark)">
+              <strong style="color:var(--navy-deep);font-family:'Cairo'">اليوم الحالي:</strong>
+              <select id="activeDay" onchange="updateActiveDay()" style="margin-top:8px;width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--gray-light);font-size:13px">
+                <option value="1">اليوم الأول - افتتاح الهاكثون</option>
+                <option value="2">اليوم الثاني - يوم العمل والتطوير</option>
+                <option value="3">اليوم الثالث - العرض والتحكيم</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:20px">
+          <div class="card-header">
+            <div class="card-title">سجل الحضور التفصيلي</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-outline btn-sm" onclick="markAllPresent()">تسجيل حضور الجميع</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>المشارك</th>
+                  <th style="text-align:center">اليوم 1</th>
+                  <th style="text-align:center">اليوم 2</th>
+                  <th style="text-align:center">اليوم 3</th>
+                  <th style="text-align:center">إجمالي الأيام</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ CERTIFICATES ============ -->
+      <div class="page" id="page-certificates">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">إصدار الشهادات</div>
+              <div class="card-sub">المشاركون المؤهلون لاستلام شهادات الحضور (يجب حضور يومين على الأقل)</div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-navy btn-sm" onclick="downloadAllCerts()">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                تنزيل جميع الشهادات
+              </button>
+            </div>
+          </div>
+
+          <div style="background:var(--off-white);border-radius:12px;padding:16px;margin-bottom:18px;display:flex;align-items:center;gap:14px">
+            <div style="width:42px;height:42px;border-radius:11px;background:rgba(63,191,169,0.15);color:var(--teal);display:flex;align-items:center;justify-content:center">
+              <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/></svg>
+            </div>
+            <div style="flex:1">
+              <div style="font-weight:700;color:var(--navy-deep);font-family:'Cairo'">معايير الأهلية للشهادة</div>
+              <div style="font-size:12px;color:var(--gray);margin-top:2px">حضور يومين على الأقل من أصل ثلاثة أيام &middot; إكمال جميع البيانات الأساسية</div>
+            </div>
+            <div style="font-family:'Cairo',sans-serif;font-size:24px;font-weight:900;color:var(--teal)" id="eligibleCount">0</div>
+          </div>
+
+          <div class="cert-list-grid" id="certList"></div>
+        </div>
+      </div>
+
+      <!-- ============ QR ============ -->
+      <div class="page" id="page-qr">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div class="qr-card">
+            <h4 style="font-size:18px;margin-bottom:18px">رمز QR لتسجيل الحضور</h4>
+            <div class="qr-display" id="qrDisplay"></div>
+            <p>اعرض هذا الرمز للمشاركين للسماح لهم بتسجيل الحضور بشكل سريع. سيتم إنشاء رمز جديد لكل يوم.</p>
+            <div style="display:flex;gap:10px;justify-content:center">
+              <select id="qrDay" onchange="generateMainQR()" style="padding:8px 14px;border:1px solid var(--gray-light);border-radius:10px">
+                <option value="1">اليوم الأول</option>
+                <option value="2">اليوم الثاني</option>
+                <option value="3">اليوم الثالث</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="downloadQR()">تنزيل الرمز</button>
+            </div>
+          </div>
+
+          <div class="card" style="margin:0">
+            <div class="card-title" style="margin-bottom:12px">طريقة الاستخدام</div>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;gap:14px;align-items:flex-start">
+                <div style="width:32px;height:32px;border-radius:10px;background:var(--teal);color:var(--white);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-family:'Cairo'">١</div>
+                <div>
+                  <div style="font-weight:700;color:var(--navy-deep);font-family:'Cairo'">اطبع الرمز</div>
+                  <div style="font-size:13px;color:var(--gray);line-height:1.6;margin-top:2px">قم بتنزيل وطباعة رمز QR ووضعه عند مدخل القاعة في كل يوم.</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:14px;align-items:flex-start">
+                <div style="width:32px;height:32px;border-radius:10px;background:var(--cyan);color:var(--white);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-family:'Cairo'">٢</div>
+                <div>
+                  <div style="font-weight:700;color:var(--navy-deep);font-family:'Cairo'">المشارك يمسح</div>
+                  <div style="font-size:13px;color:var(--gray);line-height:1.6;margin-top:2px">يمسح المشارك الرمز بكاميرا هاتفه ويفتح صفحة التسجيل.</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:14px;align-items:flex-start">
+                <div style="width:32px;height:32px;border-radius:10px;background:var(--gold);color:var(--white);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-family:'Cairo'">٣</div>
+                <div>
+                  <div style="font-weight:700;color:var(--navy-deep);font-family:'Cairo'">حضور تلقائي</div>
+                  <div style="font-size:13px;color:var(--gray);line-height:1.6;margin-top:2px">يُسجل الحضور تلقائيًا في النظام ويظهر في لوحة التحكم.</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:14px;align-items:flex-start">
+                <div style="width:32px;height:32px;border-radius:10px;background:var(--navy-deep);color:var(--white);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-family:'Cairo'">٤</div>
+                <div>
+                  <div style="font-weight:700;color:var(--navy-deep);font-family:'Cairo'">التحقق</div>
+                  <div style="font-size:13px;color:var(--gray);line-height:1.6;margin-top:2px">يمكن للمنظم التحقق وتعديل الحضور يدويًا من شاشة الحضور.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ SETTINGS ============ -->
+      <div class="page" id="page-settings">
+        <div class="card">
+          <div class="card-title">إعدادات الهاكثون</div>
+          <div class="form-grid" style="margin-top:18px">
+            <div class="field">
+              <label>اسم الفعالية</label>
+              <input type="text" id="setEventName" value="هاكثون ابتكر للتعليم">
+            </div>
+            <div class="field">
+              <label>الجهة المنظمة</label>
+              <input type="text" id="setOrganizer" value="جامعة القصيم - مركز الابتكار">
+            </div>
+            <div class="field">
+              <label>تاريخ اليوم الأول</label>
+              <input type="date" id="setDay1">
+            </div>
+            <div class="field">
+              <label>تاريخ اليوم الثالث</label>
+              <input type="date" id="setDay3">
+            </div>
+            <div class="field">
+              <label>اسم رئيس اللجنة المنظمة (للشهادات)</label>
+              <input type="text" id="setChair" value="د. عبدالعزيز الصقعبي">
+            </div>
+            <div class="field">
+              <label>المنصب</label>
+              <input type="text" id="setChairTitle" value="مدير مركز الابتكار">
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:20px">
+            <button class="btn btn-primary" onclick="saveSettings()">حفظ الإعدادات</button>
+            <button class="btn btn-outline" onclick="exportData()">تصدير البيانات (نسخ احتياطي)</button>
+            <button class="btn btn-ghost" style="margin-right:auto;color:#E04444" onclick="resetData()">إعادة تعيين كل البيانات</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">عن المنصة</div>
+          <p style="color:var(--text-dark);line-height:1.8;font-size:14px;margin-top:12px">
+            منصة "ابتكر للتعليم" مصممة لإدارة هاكثون لمدة ثلاثة أيام بسلاسة. توفر المنصة جميع الأدوات اللازمة من تسجيل المشاركين، تتبع الحضور اليومي، إلى إصدار الشهادات تلقائيًا. جميع البيانات تُحفظ محليًا في متصفحك (localStorage) ولا تُرسل لأي خادم خارجي، مما يضمن الخصوصية الكاملة.
+          </p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+            <span class="badge badge-success"><span class="dot"></span>حفظ محلي آمن</span>
+            <span class="badge badge-info"><span class="dot"></span>دعم RTL كامل</span>
+            <span class="badge badge-warning"><span class="dot"></span>تصدير Excel/PDF</span>
+            <span class="badge badge-neutral"><span class="dot"></span>QR للحضور السريع</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- content -->
+  </main>
+</div>
+
+<!-- ========= MODAL: Edit Participant ========= -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="editTitle">تعديل بيانات المشارك</h3>
+      <button class="btn-icon btn-ghost" onclick="closeEdit()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="editForm">
+        <input type="hidden" name="id">
+        <div class="form-grid">
+          <div class="field"><label>الاسم</label><input type="text" name="name" required></div>
+          <div class="field"><label>البريد</label><input type="email" name="email" required></div>
+          <div class="field"><label>الجوال</label><input type="tel" name="phone" required></div>
+          <div class="field"><label>الفئة</label><select name="category"><option>طالب</option><option>معلم</option><option>باحث</option><option>رائد أعمال</option><option>مطور</option><option>مصمم</option><option>أخرى</option></select></div>
+          <div class="field"><label>الجهة</label><input type="text" name="organization"></div>
+          <div class="field"><label>الفريق</label><input type="text" name="team"></div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" onclick="saveEdit()">حفظ التعديلات</button>
+      <button class="btn btn-outline" onclick="closeEdit()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========= MODAL: Certificate Preview ========= -->
+<div class="modal-backdrop" id="certModal">
+  <div class="modal" style="max-width:920px">
+    <div class="modal-head">
+      <h3>معاينة الشهادة</h3>
+      <button class="btn-icon btn-ghost" onclick="closeCert()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="background:var(--off-white)">
+      <div id="certHolder">
+        <div class="cert-preview" id="certCanvasWrap"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" onclick="downloadCertPDF()">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        تنزيل PDF
+      </button>
+      <button class="btn btn-outline" onclick="downloadCertImage()">تنزيل صورة</button>
+      <button class="btn btn-ghost" onclick="closeCert()">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========= TOASTS ========= -->
+<div class="toast-container" id="toasts"></div>
+
+<script>
+/* ========= STATE ========= */
+const STORE_KEY = 'ibtikr_education_v1';
+const SETTINGS_KEY = 'ibtikr_settings_v1';
+
+let state = {
+  participants: [],
+  attendance: {}, // {participantId: {1:bool, 2:bool, 3:bool}}
+  activeDay: 1,
+  currentEditId: null,
+  currentCertId: null,
+  filterDay: 0,
+};
+let settings = {
+  eventName: 'هاكثون ابتكر للتعليم',
+  organizer: 'جامعة القصيم - مركز الابتكار',
+  day1: '',
+  day3: '',
+  chair: 'د. عبدالعزيز الصقعبي',
+  chairTitle: 'مدير مركز الابتكار',
+};
+
+/* ========= STORAGE ========= */
+function loadState(){
+  try{
+    const s = localStorage.getItem(STORE_KEY);
+    if(s) state = {...state, ...JSON.parse(s)};
+    const st = localStorage.getItem(SETTINGS_KEY);
+    if(st) settings = {...settings, ...JSON.parse(st)};
+  }catch(e){console.warn('load failed',e)}
+}
+function saveState(){
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      participants: state.participants,
+      attendance: state.attendance,
+      activeDay: state.activeDay,
+    }));
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  }catch(e){console.warn('save failed',e)}
+}
+
+/* ========= NAVIGATION ========= */
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const page = document.getElementById('page-'+name);
+  if(page) page.classList.add('active');
+  document.querySelectorAll(`[data-page="${name}"]`).forEach(n=>n.classList.add('active'));
+  const titles={
+    dashboard:['لوحة التحكم','نظرة شاملة على هاكثون ابتكر للتعليم'],
+    participants:['المشاركون','إدارة جميع المشاركين المسجلين'],
+    register:['تسجيل جديد','إضافة مشارك جديد إلى الهاكثون'],
+    checkin:['تسجيل الحضور','تسجيل حضور المشاركين عبر الأيام الثلاثة'],
+    certificates:['الشهادات','إصدار شهادات الحضور للمشاركين المؤهلين'],
+    qr:['رمز QR','رمز التسجيل السريع للمشاركين'],
+    settings:['الإعدادات','إعدادات الفعالية والنسخ الاحتياطي'],
+  };
+  const t = titles[name]||['',''];
+  document.getElementById('pageTitle').textContent = t[0];
+  document.getElementById('pageSub').textContent = t[1];
+  if(name==='dashboard') renderDashboard();
+  if(name==='participants') renderParticipants();
+  if(name==='checkin') renderCheckin();
+  if(name==='certificates') renderCertificates();
+  if(name==='qr') generateMainQR();
+  if(name==='settings') loadSettingsForm();
+}
+
+/* ========= TOAST ========= */
+function toast(msg, type='success'){
+  const wrap = document.getElementById('toasts');
+  const t = document.createElement('div');
+  t.className = 'toast '+(type==='error'?'error':type==='warning'?'warning':'');
+  const icons = {
+    success:'<path d="M5 13l4 4L19 7"/>',
+    error:'<path d="M6 18L18 6M6 6l12 12"/>',
+    warning:'<path d="M12 9v2m0 4h.01M5 19h14a2 2 0 001.84-2.75L13.74 4a2 2 0 00-3.48 0L3.16 16.25A2 2 0 005 19z"/>',
+  };
+  t.innerHTML = `
+    <div class="icon"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">${icons[type]||icons.success}</svg></div>
+    <div class="msg">${msg}</div>
+  `;
+  wrap.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-20px)';t.style.transition='all 0.3s';setTimeout(()=>t.remove(),300)}, 3500);
+}
+
+/* ========= HELPERS ========= */
+function uid(){return 'P'+Date.now().toString(36)+Math.random().toString(36).substr(2,4).toUpperCase()}
+function initials(name){
+  if(!name) return '?';
+  const p = name.trim().split(/\s+/);
+  return (p[0][0]||'') + (p[1]?p[1][0]:'');
+}
+function avatarColor(id){
+  const colors = ['','c2','c3','c4'];
+  return colors[(id||'').charCodeAt(2)%4];
+}
+function formatDate(d){
+  if(!d) return '';
+  const date = new Date(d);
+  return date.toLocaleDateString('ar-SA',{year:'numeric',month:'long',day:'numeric',calendar:'gregory'});
+}
+function attendDays(id){
+  const a = state.attendance[id] || {};
+  return [a[1],a[2],a[3]].filter(Boolean).length;
+}
+
+/* ========= DASHBOARD ========= */
+function renderDashboard(){
+  const total = state.participants.length;
+  const day = state.activeDay;
+  const presentToday = state.participants.filter(p=>state.attendance[p.id]?.[day]).length;
+  const eligible = state.participants.filter(p=>attendDays(p.id)>=2).length;
+  const totalPossible = total*3;
+  const totalAttended = state.participants.reduce((s,p)=>s+attendDays(p.id),0);
+  const rate = totalPossible? Math.round(totalAttended/totalPossible*100) : 0;
+
+  document.getElementById('dashTotal').textContent = total;
+  document.getElementById('dashPresent').textContent = presentToday;
+  document.getElementById('dashEligible').textContent = eligible;
+  document.getElementById('dashRate').textContent = rate+'%';
+  document.getElementById('heroParticipants').textContent = total;
+  document.getElementById('heroAttendance').textContent = rate+'%';
+  document.getElementById('heroCerts').textContent = eligible;
+  document.getElementById('navParticipants').textContent = total;
+
+  // chart
+  const bars = document.getElementById('chartBars');
+  if(bars){
+    bars.innerHTML='';
+    const days=[1,2,3];
+    const w=120,gap=40,startX=120;
+    days.forEach((d,i)=>{
+      const cnt = state.participants.filter(p=>state.attendance[p.id]?.[d]).length;
+      const pct = total? cnt/total : 0;
+      const h = pct*150;
+      const x = startX + i*(w+gap);
+      const y = 200-h;
+      bars.innerHTML += `
+        <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="url(#barGrad${i%2+1})">
+          <animate attributeName="height" from="0" to="${h}" dur="0.8s" fill="freeze"/>
+          <animate attributeName="y" from="200" to="${y}" dur="0.8s" fill="freeze"/>
+        </rect>
+        <text x="${x+w/2}" y="${y-8}" text-anchor="middle" font-size="14" font-weight="700" fill="#1A1B4B">${cnt}</text>
+        <text x="${x+w/2}" y="220" text-anchor="middle" font-size="13" fill="#5F5E5A" font-weight="600">اليوم ${['الأول','الثاني','الثالث'][i]}</text>
+      `;
+    });
+  }
+
+  const recent = document.getElementById('recentList');
+  const sorted = [...state.participants].sort((a,b)=>b.createdAt-a.createdAt).slice(0,6);
+  if(sorted.length===0){
+    recent.innerHTML = '<div class="empty" style="padding:30px"><p style="font-size:13px">لم يتم تسجيل أي مشارك بعد.</p></div>';
+  } else {
+    recent.innerHTML = sorted.map(p=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--off-white);border-radius:10px">
+        <div class="avatar ${avatarColor(p.id)}">${initials(p.name)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:600;font-size:13px;color:var(--navy-deep);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
+          <div style="font-size:11px;color:var(--gray)">${p.category||'مشارك'} &middot; ${p.organization||'-'}</div>
+        </div>
+        <span class="badge badge-success">جديد</span>
+      </div>
+    `).join('');
+  }
+}
+
+/* ========= PARTICIPANTS ========= */
+function renderParticipants(){
+  const search = document.getElementById('searchInput')?.value?.toLowerCase() || '';
+  const cat = document.getElementById('filterCategory')?.value || '';
+  const filtered = state.participants.filter(p=>{
+    const matchSearch = !search || (p.name+p.email+p.phone+(p.organization||'')).toLowerCase().includes(search);
+    const matchCat = !cat || p.category===cat;
+    return matchSearch && matchCat;
+  });
+  const body = document.getElementById('participantsBody');
+  const empty = document.getElementById('emptyParticipants');
+  if(filtered.length===0){
+    body.innerHTML='';
+    empty.classList.remove('hide');
+    document.querySelector('#participantsTable').style.display = state.participants.length===0 ? 'none':'table';
+  } else {
+    empty.classList.add('hide');
+    document.querySelector('#participantsTable').style.display = 'table';
+    body.innerHTML = filtered.map(p=>{
+      const a = state.attendance[p.id]||{};
+      const days = attendDays(p.id);
+      const eligible = days>=2;
+      return `
+        <tr>
+          <td>
+            <div class="name-cell">
+              <div class="avatar ${avatarColor(p.id)}">${initials(p.name)}</div>
+              <div class="info">
+                <div class="nm">${p.name}</div>
+                <div class="em">${p.email}</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge badge-info"><span class="dot"></span>${p.category||'-'}</span></td>
+          <td style="font-size:13px">${p.organization||'-'}</td>
+          <td style="font-size:13px">${p.team||'-'}</td>
+          <td style="min-width:140px">
+            <div class="attend-grid">
+              <div class="attend-cell ${a[1]?'present':'pending'}" onclick="toggleAttend('${p.id}',1)">١${a[1]?' ✓':''}</div>
+              <div class="attend-cell ${a[2]?'present':'pending'}" onclick="toggleAttend('${p.id}',2)">٢${a[2]?' ✓':''}</div>
+              <div class="attend-cell ${a[3]?'present':'pending'}" onclick="toggleAttend('${p.id}',3)">٣${a[3]?' ✓':''}</div>
+            </div>
+          </td>
+          <td>
+            ${eligible ? '<span class="badge badge-success"><span class="dot"></span>مؤهل للشهادة</span>'
+                     : '<span class="badge badge-warning"><span class="dot"></span>'+days+' من 3</span>'}
+          </td>
+          <td>
+            <div class="row-actions">
+              ${eligible?`<button class="icon-btn" title="عرض الشهادة" onclick="showCertificate('${p.id}')">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/></svg>
+              </button>`:''}
+              <button class="icon-btn" title="تعديل" onclick="openEdit('${p.id}')">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </button>
+              <button class="icon-btn danger" title="حذف" onclick="deleteParticipant('${p.id}')">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+  document.getElementById('navParticipants').textContent = state.participants.length;
+}
+
+function toggleAttend(id, day){
+  if(!state.attendance[id]) state.attendance[id]={};
+  state.attendance[id][day] = !state.attendance[id][day];
+  saveState();
+  renderParticipants();
+  renderDashboard();
+  renderCheckin();
+}
+
+function deleteParticipant(id){
+  const p = state.participants.find(x=>x.id===id);
+  if(!p) return;
+  if(!confirm(`هل تريد حذف "${p.name}" نهائياً؟`)) return;
+  state.participants = state.participants.filter(x=>x.id!==id);
+  delete state.attendance[id];
+  saveState();
+  renderParticipants();
+  renderDashboard();
+  toast('تم حذف المشارك', 'warning');
+}
+
+function openEdit(id){
+  const p = state.participants.find(x=>x.id===id);
+  if(!p) return;
+  state.currentEditId = id;
+  const f = document.getElementById('editForm');
+  Object.keys(p).forEach(k=>{ if(f.elements[k]) f.elements[k].value = p[k]||''; });
+  document.getElementById('editModal').classList.add('show');
+}
+
+function closeEdit(){
+  document.getElementById('editModal').classList.remove('show');
+  state.currentEditId=null;
+}
+
+function saveEdit(){
+  if(!state.currentEditId) return;
+  const f = document.getElementById('editForm');
+  const fd = new FormData(f);
+  const idx = state.participants.findIndex(x=>x.id===state.currentEditId);
+  if(idx<0) return;
+  state.participants[idx] = {...state.participants[idx], ...Object.fromEntries(fd)};
+  saveState();
+  renderParticipants();
+  closeEdit();
+  toast('تم حفظ التعديلات بنجاح');
+}
+
+/* ========= REGISTER ========= */
+function handleRegister(e){
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const data = Object.fromEntries(fd);
+  const dup = state.participants.find(p=>p.email===data.email);
+  if(dup){ toast('البريد الإلكتروني مسجل مسبقًا!', 'error'); return; }
+  const p = {
+    id: uid(),
+    ...data,
+    createdAt: Date.now(),
+  };
+  state.participants.push(p);
+  state.attendance[p.id] = {};
+  saveState();
+  e.target.reset();
+  document.getElementById('lastRegistered').textContent = p.name + ' • ' + (p.category||'');
+  toast(`تم تسجيل ${p.name} بنجاح! 🎉`);
+  renderDashboard();
+}
+
+/* ========= CHECKIN ========= */
+function renderCheckin(){
+  const day = state.activeDay;
+  document.getElementById('activeDay').value = day;
+  document.getElementById('todayDate').textContent = `اليوم ${['','الأول','الثاني','الثالث'][day]} من الهاكثون`;
+  const present = state.participants.filter(p=>state.attendance[p.id]?.[day]).length;
+  const total = state.participants.length;
+  document.getElementById('checkinPresent').textContent = present;
+  document.getElementById('checkinRemaining').textContent = total-present;
+
+  const recent = document.getElementById('recentCheckins');
+  const todayCheckins = state.participants
+    .filter(p=>state.attendance[p.id]?.[day])
+    .slice(-5).reverse();
+  if(todayCheckins.length===0){
+    recent.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,0.5);text-align:center;padding:14px">لم يتم تسجيل حضور اليوم بعد</div>';
+  } else {
+    recent.innerHTML = todayCheckins.map(p=>`
+      <div class="recent-item">
+        <div class="avatar ${avatarColor(p.id)}" style="width:30px;height:30px;font-size:11px">${initials(p.name)}</div>
+        <div>
+          <div class="nm">${p.name}</div>
+        </div>
+        <span class="badge badge-success" style="margin-right:auto">حاضر</span>
+      </div>
+    `).join('');
+  }
+
+  const body = document.getElementById('attendanceBody');
+  if(state.participants.length===0){
+    body.innerHTML = '<tr><td colspan="5"><div class="empty" style="padding:30px"><p>لا يوجد مشاركون لتسجيل حضورهم</p></div></td></tr>';
+  } else {
+    body.innerHTML = state.participants.map(p=>{
+      const a = state.attendance[p.id]||{};
+      const total = attendDays(p.id);
+      return `
+        <tr>
+          <td>
+            <div class="name-cell">
+              <div class="avatar ${avatarColor(p.id)}">${initials(p.name)}</div>
+              <div class="info"><div class="nm">${p.name}</div><div class="em">${p.email}</div></div>
+            </div>
+          </td>
+          <td style="text-align:center"><div class="attend-cell ${a[1]?'present':'absent'}" style="display:inline-block;min-width:70px" onclick="toggleAttend('${p.id}',1)">${a[1]?'حاضر ✓':'غائب'}</div></td>
+          <td style="text-align:center"><div class="attend-cell ${a[2]?'present':'absent'}" style="display:inline-block;min-width:70px" onclick="toggleAttend('${p.id}',2)">${a[2]?'حاضر ✓':'غائب'}</div></td>
+          <td style="text-align:center"><div class="attend-cell ${a[3]?'present':'absent'}" style="display:inline-block;min-width:70px" onclick="toggleAttend('${p.id}',3)">${a[3]?'حاضر ✓':'غائب'}</div></td>
+          <td style="text-align:center">
+            <span class="badge ${total>=2?'badge-success':total>=1?'badge-warning':'badge-neutral'}" style="font-family:'Cairo',sans-serif;font-size:13px">${total} / 3</span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+}
+
+function performCheckin(){
+  const inp = document.getElementById('checkinInput');
+  const q = inp.value.trim().toLowerCase();
+  if(!q){ toast('أدخل اسم أو بريد المشارك', 'warning'); return; }
+  const p = state.participants.find(x=>
+    x.name.toLowerCase().includes(q) ||
+    x.email.toLowerCase()===q ||
+    x.phone===q ||
+    x.email.toLowerCase().startsWith(q)
+  );
+  if(!p){ toast('لم يتم العثور على المشارك', 'error'); return; }
+  const day = state.activeDay;
+  if(!state.attendance[p.id]) state.attendance[p.id]={};
+  if(state.attendance[p.id][day]){
+    toast(`${p.name} مسجل حضور اليوم بالفعل`, 'warning');
+  } else {
+    state.attendance[p.id][day] = true;
+    saveState();
+    toast(`✓ تم تسجيل حضور ${p.name}`);
+    renderCheckin();
+    renderDashboard();
+  }
+  inp.value='';
+  inp.focus();
+}
+
+function updateActiveDay(){
+  state.activeDay = parseInt(document.getElementById('activeDay').value);
+  saveState();
+  renderCheckin();
+  renderDashboard();
+}
+
+function markAllPresent(){
+  if(!confirm('تسجيل جميع المشاركين كحاضرين في اليوم '+['','الأول','الثاني','الثالث'][state.activeDay]+'؟')) return;
+  const day = state.activeDay;
+  state.participants.forEach(p=>{
+    if(!state.attendance[p.id]) state.attendance[p.id]={};
+    state.attendance[p.id][day] = true;
+  });
+  saveState();
+  renderCheckin();
+  renderDashboard();
+  toast('تم تسجيل حضور جميع المشاركين');
+}
+
+/* ========= CERTIFICATES ========= */
+function renderCertificates(){
+  const eligible = state.participants.filter(p=>attendDays(p.id)>=2);
+  document.getElementById('eligibleCount').textContent = eligible.length;
+  const list = document.getElementById('certList');
+  if(eligible.length===0){
+    list.innerHTML = `
+      <div class="empty" style="grid-column:1/-1">
+        <div class="empty-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <h3>لا يوجد مشاركون مؤهلون بعد</h3>
+        <p>سيظهر المشاركون هنا عند حضورهم يومين على الأقل من الأيام الثلاثة.</p>
+      </div>
+    `;
+    return;
+  }
+  list.innerHTML = eligible.map(p=>{
+    const days = attendDays(p.id);
+    return `
+      <div class="cert-row">
+        <div class="avatar ${avatarColor(p.id)}" style="width:46px;height:46px;font-size:15px">${initials(p.name)}</div>
+        <div class="info">
+          <div class="nm">${p.name}</div>
+          <div class="meta">
+            <span>${p.category||'مشارك'}</span>
+            <span>•</span>
+            <span>حضر ${days} من 3 أيام</span>
+            ${days===3?'<span class="badge badge-success" style="font-size:10px">حضور كامل</span>':''}
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="showCertificate('${p.id}')">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          عرض
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+function showCertificate(id){
+  const p = state.participants.find(x=>x.id===id);
+  if(!p) return;
+  state.currentCertId = id;
+  const days = attendDays(id);
+  const certNum = 'IBT-2026-' + id.slice(-6);
+  document.getElementById('certCanvasWrap').innerHTML = `
+    <div class="cert-canvas" id="certRender">
+      <div class="cert-bg"></div>
+      <div class="cert-deco-tl"></div>
+      <div class="cert-deco-lines"></div>
+      <div class="cert-deco-br"></div>
+      <div class="cert-deco-square1"></div>
+      <div class="cert-deco-square2"></div>
+      <div class="cert-deco-circle1"></div>
+
+      <div class="cert-content">
+        <div class="cert-header">
+          <div class="cert-logos">
+            <div class="cert-logo-box"><span class="cert-logo-mini"></span>جامعة القصيم</div>
+            <div class="cert-logo-box" style="background:rgba(255,255,255,0.95);color:#1A1B4B">المركز الوطني للتعليم الإلكتروني</div>
+            <div class="cert-logo-box">AWS</div>
+          </div>
+          <div class="cert-event-tag">${days===3?'حضور كامل · 3 أيام':'حضور '+days+' أيام'}</div>
+        </div>
+
+        <div class="cert-title-block">
+          <div class="cert-eyebrow">شهادة حضور وتقدير</div>
+          <div class="cert-main-title"><span class="accent1">ابتكر</span> <span class="accent2">للتعليم</span></div>
+          <div style="font-size:14px;color:var(--gray);font-weight:500;margin-bottom:6px">معًا نبتكر الحل .. لنتعلم بذكاء</div>
+          <div class="cert-divider"></div>
+          <div class="cert-recipient-label">تشهد إدارة الهاكثون بأن</div>
+          <div class="cert-recipient">${p.name}</div>
+          <div class="cert-description">
+            قد شارك في <strong>هاكثون ابتكر للتعليم</strong> الذي نظمته جامعة القصيم بالتعاون مع المركز الوطني للتعليم الإلكتروني وAWS، وأكمل ${days===3?'كامل أيام البرنامج الثلاثة':days+' أيام من أيام البرنامج'} بحضور فعّال ومساهمة مميزة. ${p.category?'بصفته '+p.category:''} ${p.organization?'من '+p.organization:''}.
+          </div>
+        </div>
+
+        <div class="cert-footer">
+          <div class="cert-sig">
+            <div class="cert-sig-line"></div>
+            <div class="cert-sig-name">${settings.chair}</div>
+            <div class="cert-sig-title">${settings.chairTitle}</div>
+          </div>
+          <div class="cert-meta">
+            <div class="id">${certNum}</div>
+            <div class="dt">${formatDate(new Date())}</div>
+          </div>
+          <div class="cert-sig">
+            <div class="cert-qr-mini" id="certQRMini"></div>
+            <div class="cert-sig-title" style="margin-top:4px">رمز التحقق</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  // mini QR
+  setTimeout(()=>{
+    const el = document.getElementById('certQRMini');
+    if(el && typeof QRCode!=='undefined'){
+      el.innerHTML='';
+      try{
+        new QRCode(el, {
+          text: `IBTIKR|${certNum}|${p.name}|${days}days`,
+          width: 56, height: 56,
+          colorDark: '#1A1B4B', colorLight: '#F5F6FA',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      }catch(e){console.warn(e)}
+    }
+  },50);
+  document.getElementById('certModal').classList.add('show');
+}
+
+function closeCert(){
+  document.getElementById('certModal').classList.remove('show');
+  state.currentCertId=null;
+}
+
+async function downloadCertPDF(){
+  if(!state.currentCertId) return;
+  const p = state.participants.find(x=>x.id===state.currentCertId);
+  const el = document.getElementById('certRender');
+  if(!el) return;
+  toast('جاري إنشاء ملف PDF...', 'success');
+  try{
+    const canvas = await html2canvas(el, {scale:2, backgroundColor:'#FFFFFF', useCORS:true});
+    const img = canvas.toDataURL('image/jpeg', 0.95);
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('landscape','mm','a4');
+    const w = pdf.internal.pageSize.getWidth();
+    const h = pdf.internal.pageSize.getHeight();
+    pdf.addImage(img, 'JPEG', 0, 0, w, h);
+    pdf.save(`certificate_${p.name.replace(/\s+/g,'_')}.pdf`);
+    toast('تم تنزيل الشهادة بصيغة PDF ✓');
+  }catch(e){
+    console.error(e);
+    toast('حدث خطأ، جرّب تنزيل صورة', 'error');
+  }
+}
+
+async function downloadCertImage(){
+  if(!state.currentCertId) return;
+  const p = state.participants.find(x=>x.id===state.currentCertId);
+  const el = document.getElementById('certRender');
+  if(!el) return;
+  try{
+    const canvas = await html2canvas(el, {scale:2, backgroundColor:'#FFFFFF', useCORS:true});
+    const link = document.createElement('a');
+    link.download = `certificate_${p.name.replace(/\s+/g,'_')}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    toast('تم تنزيل الشهادة كصورة ✓');
+  }catch(e){
+    console.error(e);
+    toast('حدث خطأ', 'error');
+  }
+}
+
+async function downloadAllCerts(){
+  const eligible = state.participants.filter(p=>attendDays(p.id)>=2);
+  if(eligible.length===0){ toast('لا يوجد مشاركون مؤهلون', 'warning'); return; }
+  if(!confirm(`سيتم تنزيل ${eligible.length} شهادة بصيغة PDF. متابعة؟`)) return;
+  toast(`جاري إعداد ${eligible.length} شهادة...`);
+  for(const p of eligible){
+    showCertificate(p.id);
+    await new Promise(r=>setTimeout(r,400));
+    await downloadCertPDF();
+    await new Promise(r=>setTimeout(r,300));
+  }
+  closeCert();
+  toast(`✓ تم تنزيل ${eligible.length} شهادة بنجاح`);
+}
+
+/* ========= QR CODE ========= */
+function generateMainQR(){
+  const day = document.getElementById('qrDay')?.value || 1;
+  const el = document.getElementById('qrDisplay');
+  if(!el || typeof QRCode==='undefined') return;
+  el.innerHTML='';
+  try{
+    new QRCode(el, {
+      text: `IBTIKR_HACKATHON_DAY${day}_CHECKIN`,
+      width: 220, height: 220,
+      colorDark: '#1A1B4B', colorLight: '#FFFFFF',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  }catch(e){console.warn(e)}
+}
+
+async function downloadQR(){
+  const day = document.getElementById('qrDay').value;
+  const el = document.getElementById('qrDisplay');
+  const canvas = el.querySelector('canvas');
+  if(!canvas){ toast('انتظر لحظة...', 'warning'); return; }
+  const link = document.createElement('a');
+  link.download = `ibtikr_qr_day${day}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  toast('تم تنزيل رمز QR ✓');
+}
+
+/* ========= EXPORT ========= */
+function exportToExcel(){
+  if(state.participants.length===0){ toast('لا يوجد بيانات للتصدير', 'warning'); return; }
+  const data = state.participants.map(p=>{
+    const a = state.attendance[p.id]||{};
+    return {
+      'الاسم': p.name,
+      'البريد': p.email,
+      'الجوال': p.phone,
+      'الفئة': p.category||'',
+      'الجهة': p.organization||'',
+      'الفريق': p.team||'',
+      'المدينة': p.city||'',
+      'اليوم 1': a[1]?'حاضر':'غائب',
+      'اليوم 2': a[2]?'حاضر':'غائب',
+      'اليوم 3': a[3]?'حاضر':'غائب',
+      'إجمالي': attendDays(p.id),
+      'مؤهل للشهادة': attendDays(p.id)>=2?'نعم':'لا',
+    };
+  });
+  const ws = XLSX.utils.json_to_sheet(data);
+  ws['!cols'] = [{wch:25},{wch:25},{wch:14},{wch:12},{wch:20},{wch:18},{wch:14},{wch:10},{wch:10},{wch:10},{wch:10},{wch:14}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'المشاركون');
+  XLSX.writeFile(wb, `ibtikr_participants_${new Date().toISOString().slice(0,10)}.xlsx`);
+  toast('تم تصدير ملف Excel ✓');
+}
+
+function exportData(){
+  const data = JSON.stringify({participants:state.participants,attendance:state.attendance,settings},null,2);
+  const blob = new Blob([data],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=`ibtikr_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('تم تصدير نسخة احتياطية ✓');
+}
+
+function resetData(){
+  if(!confirm('هل أنت متأكد من إعادة تعيين كل البيانات؟ لا يمكن التراجع!')) return;
+  if(!confirm('تأكيد ثاني: سيتم حذف جميع المشاركين وسجل الحضور!')) return;
+  state.participants = [];
+  state.attendance = {};
+  saveState();
+  renderAll();
+  toast('تم إعادة تعيين كل البيانات', 'warning');
+}
+
+/* ========= SETTINGS ========= */
+function loadSettingsForm(){
+  document.getElementById('setEventName').value = settings.eventName;
+  document.getElementById('setOrganizer').value = settings.organizer;
+  document.getElementById('setDay1').value = settings.day1;
+  document.getElementById('setDay3').value = settings.day3;
+  document.getElementById('setChair').value = settings.chair;
+  document.getElementById('setChairTitle').value = settings.chairTitle;
+}
+
+function saveSettings(){
+  settings = {
+    eventName: document.getElementById('setEventName').value,
+    organizer: document.getElementById('setOrganizer').value,
+    day1: document.getElementById('setDay1').value,
+    day3: document.getElementById('setDay3').value,
+    chair: document.getElementById('setChair').value,
+    chairTitle: document.getElementById('setChairTitle').value,
+  };
+  saveState();
+  toast('تم حفظ الإعدادات ✓');
+}
+
+/* ========= INIT ========= */
+function renderAll(){
+  renderDashboard();
+  renderParticipants();
+  renderCheckin();
+  renderCertificates();
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  loadState();
+
+  // nav handlers
+  document.querySelectorAll('[data-page]').forEach(el=>{
+    el.addEventListener('click', ()=> showPage(el.dataset.page));
+  });
+
+  // day pills
+  document.querySelectorAll('.day-pill').forEach(p=>{
+    p.addEventListener('click', ()=>{
+      document.querySelectorAll('.day-pill').forEach(x=>x.classList.remove('active'));
+      p.classList.add('active');
+      state.filterDay = parseInt(p.dataset.day);
+      if(state.filterDay>0){
+        state.activeDay = state.filterDay;
+        document.getElementById('activeDay').value = state.activeDay;
+      }
+      renderAll();
+    });
+  });
+
+  // checkin enter key
+  const ci = document.getElementById('checkinInput');
+  if(ci){
+    ci.addEventListener('keypress', e=>{
+      if(e.key==='Enter') performCheckin();
+    });
+  }
+
+  // sample data on first load
+  if(state.participants.length===0){
+    const samples = [
+      {name:'عبدالله بن محمد العتيبي', email:'a.alotaibi@qu.edu.sa', phone:'0501234567', category:'طالب', organization:'جامعة القصيم', team:'فريق المبدعين', city:'بريدة', notes:''},
+      {name:'فاطمة سعد القحطاني', email:'fatimah@example.com', phone:'0509876543', category:'معلم', organization:'وزارة التعليم', team:'فريق المستقبل', city:'الرياض', notes:''},
+      {name:'محمد عبدالعزيز السبيعي', email:'m.subaie@gmail.com', phone:'0567891234', category:'مطور', organization:'مستقل', team:'فريق المبدعين', city:'الدمام', notes:''},
+      {name:'نورا خالد الدوسري', email:'nora.k@hotmail.com', phone:'0534567890', category:'باحث', organization:'جامعة الملك سعود', team:'فريق الذكاء', city:'الرياض', notes:''},
+      {name:'يوسف ابراهيم الحربي', email:'y.alharbi@qu.edu.sa', phone:'0512345678', category:'طالب', organization:'جامعة القصيم', team:'فريق الذكاء', city:'بريدة', notes:''},
+    ];
+    samples.forEach((s,i)=>{
+      const id = uid();
+      state.participants.push({id, ...s, createdAt: Date.now()-i*60000});
+      // demo attendance
+      state.attendance[id] = {1:i<4, 2:i<3, 3:i<2};
+    });
+    saveState();
+  }
+
+  renderAll();
+  generateMainQR();
+});
+</script>
+</body>
+</html>
